@@ -73,10 +73,10 @@ angular.module('cloudberry.map')
     
     // initialize countmap
     function setInfoControlCountMap() {
-    
+
       // Interaction function
       // highlight a polygon when the mouse is pointing at it
-      function highlightFeature(leafletEvent) {
+      function highlightPopupInfo(leafletEvent) {
         if (cloudberry.parameters.maptype == 'countmap'){
           var layer = leafletEvent.target;
           layer.setStyle($scope.styles.hoverStyle);
@@ -84,6 +84,13 @@ angular.module('cloudberry.map')
             layer.bringToFront();
           }
           $scope.selectedPlace = layer.feature;
+
+          // $scope.popUpInfo = L.popup({maxWidth:300, minWidth:300, maxHight:300});
+          // $scope.popUpInfo.setContent("more information...");
+          // layer.bindPopup($scope.popUpInfo).openPopup();
+
+          layer.bindPopup("more information...").openPopup();
+
         }
       }
 
@@ -117,7 +124,7 @@ angular.module('cloudberry.map')
       // zoom in to fit the polygon when the polygon is clicked
       function onEachFeature(feature, layer) {
         layer.on({
-          mouseover: highlightFeature,
+          mouseover: highlightPopupInfo,
           mouseout: resetHighlight,
           click: $scope.zoomToFeature
         });
