@@ -67,7 +67,10 @@ object Dependencies {
     "org.webjars" % "font-awesome" % "4.5.0",
     "org.webjars.bower" % "bootstrap-vertical-tabs" % "1.2.1",
     // other module
-    "com.fasterxml.jackson.core" % "jackson-core" % "2.9.4"
+    "com.fasterxml.jackson.core" % "jackson-core" % "2.9.4",
+    // draw chart module
+    "org.webjars.bower" % "chart.js" % "2.7.2",
+    "org.webjars.npm" % "tc-angular-chartjs" % "2.1.4"
 
   ) ++ testDeps
 }
