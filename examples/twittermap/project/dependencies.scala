@@ -69,8 +69,7 @@ object Dependencies {
     // other module
     "com.fasterxml.jackson.core" % "jackson-core" % "2.9.4",
     // draw chart module
-    "org.webjars.bower" % "chart.js" % "2.7.2",
-    "org.webjars.npm" % "tc-angular-chartjs" % "2.1.4"
+    "org.webjars.bower" % "chart.js" % "2.7.2"
 
   ) ++ testDeps
 }

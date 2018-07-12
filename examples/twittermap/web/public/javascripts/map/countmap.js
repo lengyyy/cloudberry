@@ -74,9 +74,10 @@ angular.module('cloudberry.map')
     // initialize countmap
     function setInfoControlCountMap() {
       // Interaction function
-      // highlight a polygon when the mouse is pointing at it
+      // highlight a polygon when the mouse is pointing at it, and popup a window
       function highlightPopupInfo(leafletEvent) {
         if (cloudberry.parameters.maptype == 'countmap'){
+          // highlight a polygon
           var layer = leafletEvent.target;
           layer.setStyle($scope.styles.hoverStyle);
           if (!L.Browser.ie && !L.Browser.opera) {
@@ -84,90 +85,41 @@ angular.module('cloudberry.map')
           }
           $scope.selectedPlace = layer.feature;
 
-          //demo data for line chart
-          $scope.chart;
-          $scope.chartClick = function( event ) {
-              if ( $scope.chart ) {
-                  // Different methods depending on chart type
-                  console.log( $scope.chart.getPointsAtEvent( event ) ); // for Points
-                  // console.log( $scope.chart.getSegmentsAtEvent( event ) ); // for Segments
-              }
-          };
-          $scope.data = {
-              labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-              datasets: [
-                  {
-                      label: 'My First dataset',
-                      fillColor: 'rgba(220,220,220,0.2)',
-                      strokeColor: 'rgba(220,220,220,1)',
-                      pointColor: 'rgba(220,220,220,1)',
-                      pointStrokeColor: '#fff',
-                      pointHighlightFill: '#fff',
-                      pointHighlightStroke: 'rgba(220,220,220,1)',
-                      data: [65, 59, 80, 81, 56, 55, 40]
-                  },
-                  {
-                      label: 'My Second dataset',
-                      fillColor: 'rgba(151,187,205,0.2)',
-                      strokeColor: 'rgba(151,187,205,1)',
-                      pointColor: 'rgba(151,187,205,1)',
-                      pointStrokeColor: '#fff',
-                      pointHighlightFill: '#fff',
-                      pointHighlightStroke: 'rgba(151,187,205,1)',
-                      data: [28, 48, 40, 19, 86, 27, 90]
-                  }
-              ]
-          };
-          $scope.options =  {
-              // Sets the chart to be responsive
-              responsive: true,
-              ///Boolean - Whether grid lines are shown across the chart
-              scaleShowGridLines : true,
-              //String - Colour of the grid lines
-              scaleGridLineColor : "rgba(0,0,0,.05)",
-              //Number - Width of the grid lines
-              scaleGridLineWidth : 1,
-              //Boolean - Whether the line is curved between points
-              bezierCurve : true,
-              //Number - Tension of the bezier curve between points
-              bezierCurveTension : 0.4,
-              //Boolean - Whether to show a dot for each point
-              pointDot : true,
-              //Number - Radius of each point dot in pixels
-              pointDotRadius : 4,
-              //Number - Pixel width of point dot stroke
-              pointDotStrokeWidth : 1,
-              //Number - amount extra to add to the radius to cater for hit detection outside the drawn point
-              pointHitDetectionRadius : 20,
-              //Boolean - Whether to show a stroke for datasets
-              datasetStroke : true,
-              //Number - Pixel width of dataset stroke
-              datasetStrokeWidth : 2,
-              //Boolean - Whether to fill the dataset with a colour
-              datasetFill : true,
-              // Function - on animation progress
-              onAnimationProgress: function(){},
-              // Function - on animation complete
-              onAnimationComplete: function(){},
-              //String - A legend template
-              legendTemplate : '<ul class="tc-chart-js-legend"><% for (var i=0; i<datasets.length; i++){%><li><span style="background-color:<%=datasets[i].strokeColor%>"></span><%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>'
-          };
-            console.log($scope.data);
-
-          //bind a pop up window
+          // bind a pop up window to chart
           var linechart =
-              "<div>" +
-              "<canvas tc-chartjs-line " +
-              "chart-options=\"options\" " +
-              "chart-data=\"data\" " +
-              "auto-legend " +
-              "ng-click=\"chartClick($event)\" " +
-              "chart=\"chart\"></canvas>" +
-              "</div>" +
-              "<div>kkk</div>";
+              "<canvas id=\"myChart\" width=\"400\" height=\"400\"></canvas>";
+          $compile(linechart)($scope);
           $scope.popUpInfo = L.popup();
           $scope.popUpInfo.setContent(linechart);
           layer.bindPopup($scope.popUpInfo).openPopup();
+
+          // draw line chart
+          var ctx = document.getElementById("myChart").getContext('2d');
+          var myChart = new Chart(ctx, {
+              type: 'line',
+              // demo data
+              data: {
+                  labels: [1500,1600,1700,1750,1800,1850,1900,1950,1999,2050],
+                  datasets: [{
+                      data: [86,114,106,106,107,111,133,221,783,2478],
+                      label: "Africa",
+                      borderColor: "#3e95cd",
+                      fill: false
+                  }, {
+                      data: [282,350,411,502,635,809,947,1402,3700,5267],
+                      label: "Asia",
+                      borderColor: "#8e5ea2",
+                      fill: false
+                  }
+                  ]
+              },
+              options: {
+                  title: {
+                      display: true,
+                      text: 'Demo Line Chart'
+                  }
+              }
+          });
 
         }
       }
