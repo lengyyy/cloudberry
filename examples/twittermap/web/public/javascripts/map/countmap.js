@@ -73,6 +73,7 @@ angular.module('cloudberry.map')
 
     // initialize countmap
     function setInfoControlCountMap() {
+
       // Interaction function
       // highlight a polygon when the mouse is pointing at it, and popup a window
       function highlightPopupInfo(leafletEvent) {
@@ -88,7 +89,6 @@ angular.module('cloudberry.map')
           // bind a pop up window to chart
           var linechart =
               "<canvas id=\"myChart\" width=\"400\" height=\"400\"></canvas>";
-          $compile(linechart)($scope);
           $scope.popUpInfo = L.popup();
           $scope.popUpInfo.setContent(linechart);
           layer.bindPopup($scope.popUpInfo).openPopup();
