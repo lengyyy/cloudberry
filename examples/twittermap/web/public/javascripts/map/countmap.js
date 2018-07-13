@@ -86,10 +86,21 @@ angular.module('cloudberry.map')
           }
           $scope.selectedPlace = layer.feature;
 
-          // bind a pop up window to chart
-          var linechart =
+          // get the count info of polygon
+          var placeName = $scope.selectedPlace.properties.name;
+          var infoPromp = $scope.infoPromp;
+          var countText = '0';
+          if($scope.selectedPlace.properties.countText) {
+            countText = $scope.selectedPlace.properties.countText;
+          }
+
+          // bind a pop up window
+          var linechart = '<div class="popup-info">' +
+              '<div class="popup-statename">'+placeName+'</div>' +
+              '<div class="popup-count">'+infoPromp+'<b> '+countText+'</b></div>' +
+              '</div>'+
               "<canvas id=\"myChart\" width=\"400\" height=\"400\"></canvas>";
-          $scope.popUpInfo = L.popup();
+          $scope.popUpInfo = L.popup({autoClose:false});
           $scope.popUpInfo.setContent(linechart);
           layer.bindPopup($scope.popUpInfo).openPopup();
 
@@ -115,7 +126,7 @@ angular.module('cloudberry.map')
               },
               options: {
                   title: {
-                      display: true,
+                      display: false,
                       text: 'Demo Line Chart'
                   }
               }
@@ -160,31 +171,31 @@ angular.module('cloudberry.map')
         });
       }
 
-      // add info control
-      var info = L.control();
-
-      info.onAdd = function() {
-        this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
-        this._div.style.margin = '20% 0 0 0';
-        this._div.innerHTML = [
-          '<h4><span ng-bind="infoPromp + \' by \' + status.logicLevel"></span></h4>',
-          '<b><span ng-bind="selectedPlace.properties.name || \'No place selected\'"></span></b>',
-          '<br/>',
-          '<span ng-bind="infoPromp"></span> <span ng-bind="selectedPlace.properties.countText || \'0\'"></span>'
-        ].join('');
-        $compile(this._div)($scope);
-        return this._div;
-      };
-
-      info.options = {
-        position: 'topleft'
-      };
-      if ($scope.map){
-        info.addTo($scope.map);
-      }
-      else {
-        $scope.controls.custom.push(info);
-      }
+      // // add info control
+      // var info = L.control();
+      //
+      // info.onAdd = function() {
+      //   this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
+      //   this._div.style.margin = '20% 0 0 0';
+      //   this._div.innerHTML = [
+      //     '<h4><span ng-bind="infoPromp + \' by \' + status.logicLevel"></span></h4>',
+      //     '<b><span ng-bind="selectedPlace.properties.name || \'No place selected\'"></span></b>',
+      //     '<br/>',
+      //     '<span ng-bind="infoPromp"></span> <span ng-bind="selectedPlace.properties.countText || \'0\'"></span>'
+      //   ].join('');
+      //   $compile(this._div)($scope);
+      //   return this._div;
+      // };
+      //
+      // info.options = {
+      //   position: 'topleft'
+      // };
+      // if ($scope.map){
+      //   info.addTo($scope.map);
+      // }
+      // else {
+      //   $scope.controls.custom.push(info);
+      // }
 
       $scope.loadGeoJsonFiles(onEachFeature);
 
