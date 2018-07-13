@@ -100,7 +100,7 @@ angular.module('cloudberry.map')
               '<div class="popup-count">'+infoPromp+'<b> '+countText+'</b></div>' +
               '</div>'+
               "<canvas id=\"myChart\" width=\"400\" height=\"400\"></canvas>";
-          $scope.popUpInfo = L.popup({autoClose:false});
+          $scope.popUpInfo = L.popup();
           $scope.popUpInfo.setContent(linechart);
           layer.bindPopup($scope.popUpInfo).openPopup();
 
