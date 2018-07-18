@@ -90,13 +90,14 @@ angular.module('cloudberry.map')
           var placeName = $scope.selectedPlace.properties.name;
           var infoPromp = $scope.infoPromp;
           var countText = '0';
+          var logicLevel = $scope.status.logicLevel;
           if($scope.selectedPlace.properties.countText) {
             countText = $scope.selectedPlace.properties.countText;
           }
 
           // bind a pop up window
           var linechart = '<div class="popup-info">' +
-              '<div class="popup-statename">'+placeName+'</div>' +
+              '<div class="popup-statename">'+logicLevel+': '+placeName+'</div>' +
               '<div class="popup-count">'+infoPromp+'<b> '+countText+'</b></div>' +
               '</div>'+
               "<canvas id=\"myChart\" width=\"400\" height=\"400\"></canvas>";
