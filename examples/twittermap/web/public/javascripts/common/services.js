@@ -1,4 +1,4 @@
-angular.module('cloudberry.common', ['cloudberry.mapresultcache'])
+angular.module('cloudberry.common', ['cloudberry.mapresultcache','cloudberry.timeseriescache'])
   .factory('cloudberryConfig', function(){
     return {
       ws: "ws://" + location.host + "/ws",
@@ -41,7 +41,7 @@ angular.module('cloudberry.common', ['cloudberry.mapresultcache'])
       }
     };
   })
-  .service('cloudberry', function($timeout, cloudberryConfig, MapResultCache) {
+  .service('cloudberry', function($timeout, cloudberryConfig, MapResultCache, TimeSeriesCache) {
     var startDate = config.startDate;
     var endDate = config.endDate;
     var defaultNonSamplingDayRange = 1500;
@@ -334,6 +334,7 @@ angular.module('cloudberry.common', ['cloudberry.mapresultcache'])
       countmapPartialMapResult: [],
       commonTimeSeriesResult: [],
       commonHashTagResult: [],
+      commonChartDataMap: new HashMap(),
       errorMessage: null,
 
       query: function(parameters) {
@@ -567,6 +568,10 @@ angular.module('cloudberry.common', ['cloudberry.mapresultcache'])
             if(angular.isArray(result.value)) {
               cloudberryService.commonTimeSeriesResult = getTimeSeriesValues(result.value[0]);
               cloudberryService.commonHashTagResult = result.value[1];
+              cloudberryService.commonChartDataMap = TimeSeriesCache.arrayToStore(cloudberryService.parameters.geoIds,result.value[0],cloudberryService.parameters.geoLevel);
+              console.log(cloudberryService.parameters.geoIds);
+              console.log(result.value[0]);
+              console.log(cloudberryService.commonChartDataMap);
             }
             break;
           // Partial map result cache hit or complete cache miss case
@@ -575,6 +580,10 @@ angular.module('cloudberry.common', ['cloudberry.mapresultcache'])
               cloudberryService.commonTimeSeriesResult = getTimeSeriesValues(result.value[0]);
               cloudberryService.countmapMapResult = result.value[1].concat(cloudberryService.countmapPartialMapResult);
               cloudberryService.commonHashTagResult = result.value[2];
+              cloudberryService.commonChartDataMap = TimeSeriesCache.arrayToStore(cloudberryService.parameters.geoIds,result.value[0],cloudberryService.parameters.geoLevel);
+                console.log(cloudberryService.parameters.geoIds);
+                console.log(result.value[0]);
+                console.log(cloudberryService.commonChartDataMap);
             }
             // When the query is executed completely, we update the map result cache.
             if((cloudberryConfig.querySliceMills > 0 && !angular.isArray(result.value) &&

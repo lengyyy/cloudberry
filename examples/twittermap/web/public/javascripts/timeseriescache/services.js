@@ -89,9 +89,10 @@ angular.module('cloudberry.timeseriescache', [])
         /**
          * Convert byTimeSeries result array to timeseriesStore HashMap format.
          */
-        this.arrayToStore = function (geoIds, timeseriesResult) {
+        this.arrayToStore = function (geoIds, timeseriesResult, geolevel) {
             var store = new HashMap();
             var geoIdSet = new Set(geoIds);
+            currentGeoLevel = geolevel;
 
             for (var i = 0; i < timeseriesResult.length; i++) {
                 var currVal = {day:timeseriesResult[i]["day"], count:timeseriesResult[i]["count"]};
@@ -105,7 +106,7 @@ angular.module('cloudberry.timeseriescache', [])
                     store.set(timeseriesResult[i][currentGeoLevel], [currVal]);
                     geoIdSet.delete(timeseriesResult[i][currentGeoLevel]);
                 }
-            };
+            }
             // Mark other results as checked: these are geoIds with no results
             geoIdSet.forEach(function (value) {
                 store.set(value, INVALID_VALUE);

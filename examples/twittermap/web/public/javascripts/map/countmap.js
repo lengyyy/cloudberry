@@ -1,9 +1,11 @@
 angular.module('cloudberry.map')
-  .controller('countMapCtrl', function($scope, $rootScope, $window, $http, $compile, cloudberry, leafletData, cloudberryConfig, Cache,TimeSeriesCache) {
+  .controller('countMapCtrl', function($scope, $rootScope, $window, $http, $compile, cloudberry, leafletData, cloudberryConfig, Cache) {
     // Array to store the data for chart
     $scope.chartData=[];
+    // Map to store the chart data for every polygon
+    $scope.ChartDataMap = new HashMap();
 
-    // Convert the commonTimeSeriesResult to data can be read by chart.js
+    // Convert the array in chartDataMap to data can be read by chart.js
     $scope.preProcess = function (result) {
         var result_array = [];
         if (result && result[0]) {
@@ -13,26 +15,24 @@ angular.module('cloudberry.map')
                 value = +value.count;
                 result_array.push({'x': key, 'y': value});
             });
+            result_array.sort(function(a,b){
+                return b.x - a.x;
+            });
         }
-        result_array.sort(function(a,b){
-            return b.x - a.x;
-        });
         return result_array;
     };
 
-    // Watch the cloudberry.commonTimeSeriesResult, to change chartData
+    // Watch the cloudberry.commonChartDataMap, to change chartDataMap
     $scope.$watch(
         function() {
-            return cloudberry.commonTimeSeriesResult;
+            return cloudberry.commonChartDataMap;
         },
-
         function(newResult) {
             if(newResult) {
-                $scope.chartData = $scope.preProcess(newResult);
+                $scope.ChartDataMap = newResult;
             }
         }
     );
-
 
     // set map styles for countmap
     function setCountMapStyle() {
@@ -118,7 +118,11 @@ angular.module('cloudberry.map')
           if (!L.Browser.ie && !L.Browser.opera) {
             layer.bringToFront();
           }
+
+          // get chart data for the polygon
           $scope.selectedPlace = layer.feature;
+          $scope.selectedGeoID = $scope.selectedPlace.properties.cityID || $scope.selectedPlace.properties.countyID || $scope.selectedPlace.properties.stateID;
+          $scope.chartData = $scope.preProcess($scope.ChartDataMap.get($scope.selectedGeoID));
 
           // get the count info of polygon
           var placeName = $scope.selectedPlace.properties.name;
@@ -139,12 +143,12 @@ angular.module('cloudberry.map')
           $scope.popUpInfo.setContent(linechart);
           layer.bindPopup($scope.popUpInfo).openPopup();
 
+          // If there are chartData, draw the line chart
           if($scope.chartData.length===0) {
               document.getElementById("myChart").style.height = 0;
               document.getElementById("popup-count").style.marginBottom = 0;
               document.getElementById("popup-info").style.marginBottom = 0;
           }else {
-              // draw line chart
               var ctx = document.getElementById("myChart").getContext('2d');
               var myChart = new Chart(ctx, {
                   type: 'line',
@@ -176,7 +180,7 @@ angular.module('cloudberry.map')
                               scaleLabel: {
                                   display: true,
                                   labelString: 'Count'
-                              },
+                              }
                           }]
                       }
                   }
