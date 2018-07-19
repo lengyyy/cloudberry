@@ -1,5 +1,39 @@
 angular.module('cloudberry.map')
-  .controller('countMapCtrl', function($scope, $rootScope, $window, $http, $compile, cloudberry, leafletData, cloudberryConfig, Cache) {
+  .controller('countMapCtrl', function($scope, $rootScope, $window, $http, $compile, cloudberry, leafletData, cloudberryConfig, Cache,TimeSeriesCache) {
+    // Array to store the data for chart
+    $scope.chartData=[];
+
+    // Convert the commonTimeSeriesResult to data can be read by chart.js
+    $scope.preProcess = function (result) {
+        var result_array = [];
+        if (result && result[0]) {
+            var granu = Object.keys(result[0])[0];
+            angular.forEach(result, function (value, key) {
+                key = new Date(value[granu]);
+                value = +value.count;
+                result_array.push({'x': key, 'y': value});
+            });
+        }
+        result_array.sort(function(a,b){
+            return b.x - a.x;
+        });
+        return result_array;
+    };
+
+    // Watch the cloudberry.commonTimeSeriesResult, to change chartData
+    $scope.$watch(
+        function() {
+            return cloudberry.commonTimeSeriesResult;
+        },
+
+        function(newResult) {
+            if(newResult) {
+                $scope.chartData = $scope.preProcess(newResult);
+            }
+        }
+    );
+
+
     // set map styles for countmap
     function setCountMapStyle() {
       $scope.setStyles({
@@ -96,43 +130,58 @@ angular.module('cloudberry.map')
           }
 
           // bind a pop up window
-          var linechart = '<div class="popup-info">' +
-              '<div class="popup-statename">'+logicLevel+': '+placeName+'</div>' +
-              '<div class="popup-count">'+infoPromp+'<b> '+countText+'</b></div>' +
+          var linechart = '<div id="popup-info">' +
+              '<div id="popup-statename">'+logicLevel+': '+placeName+'</div>' +
+              '<div id="popup-count">'+infoPromp+'<b> '+countText+'</b></div>' +
               '</div>'+
-              "<canvas id=\"myChart\" width=\"400\" height=\"400\"></canvas>";
+              "<canvas id=\"myChart\"></canvas>";
           $scope.popUpInfo = L.popup();
           $scope.popUpInfo.setContent(linechart);
           layer.bindPopup($scope.popUpInfo).openPopup();
 
-          // draw line chart
-          var ctx = document.getElementById("myChart").getContext('2d');
-          var myChart = new Chart(ctx, {
-              type: 'line',
-              // demo data
-              data: {
-                  labels: [1500,1600,1700,1750,1800,1850,1900,1950,1999,2050],
-                  datasets: [{
-                      data: [86,114,106,106,107,111,133,221,783,2478],
-                      label: "Africa",
-                      borderColor: "#3e95cd",
-                      fill: false
-                  }, {
-                      data: [282,350,411,502,635,809,947,1402,3700,5267],
-                      label: "Asia",
-                      borderColor: "#8e5ea2",
-                      fill: false
-                  }
-                  ]
-              },
-              options: {
-                  title: {
-                      display: false,
-                      text: 'Demo Line Chart'
-                  }
-              }
-          });
+          if($scope.chartData.length===0) {
+              document.getElementById("myChart").style.height = 0;
+              document.getElementById("popup-count").style.marginBottom = 0;
+              document.getElementById("popup-info").style.marginBottom = 0;
+          }else {
+              // draw line chart
+              var ctx = document.getElementById("myChart").getContext('2d');
+              var myChart = new Chart(ctx, {
+                  type: 'line',
+                  data:{
+                      datasets:[{
+                          data:$scope.chartData,
+                          borderColor: "#3e95cd",
+                          borderWidth: 1,
+                          pointRadius: 1.5
+                      }]
+                  },
 
+                  options: {
+                      legend: {
+                          display: false
+                      },
+                      scales: {
+                          xAxes: [{
+                              type: 'time',
+                              time: {
+                                  unit:'month'
+                              },
+                              scaleLabel: {
+                                  display: true,
+                                  labelString: 'Date'
+                              }
+                          }],
+                          yAxes: [{
+                              scaleLabel: {
+                                  display: true,
+                                  labelString: 'Count'
+                              },
+                          }]
+                      }
+                  }
+              });
+          }
         }
       }
 

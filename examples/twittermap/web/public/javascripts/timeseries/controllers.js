@@ -95,7 +95,7 @@ angular.module('cloudberry.timeseries', ['cloudberry.common'])
                 if(newVal.length == 0)
                   return;
             }
-            
+
             $scope.queried = true;
             var ndx = $scope.ndx;
             if (ndx) {
