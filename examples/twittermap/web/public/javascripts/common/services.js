@@ -569,9 +569,6 @@ angular.module('cloudberry.common', ['cloudberry.mapresultcache','cloudberry.tim
               cloudberryService.commonTimeSeriesResult = getTimeSeriesValues(result.value[0]);
               cloudberryService.commonHashTagResult = result.value[1];
               cloudberryService.commonChartDataMap = TimeSeriesCache.arrayToStore(cloudberryService.parameters.geoIds,result.value[0],cloudberryService.parameters.geoLevel);
-              console.log(cloudberryService.parameters.geoIds);
-              console.log(result.value[0]);
-              console.log(cloudberryService.commonChartDataMap);
             }
             break;
           // Partial map result cache hit or complete cache miss case
@@ -581,9 +578,6 @@ angular.module('cloudberry.common', ['cloudberry.mapresultcache','cloudberry.tim
               cloudberryService.countmapMapResult = result.value[1].concat(cloudberryService.countmapPartialMapResult);
               cloudberryService.commonHashTagResult = result.value[2];
               cloudberryService.commonChartDataMap = TimeSeriesCache.arrayToStore(cloudberryService.parameters.geoIds,result.value[0],cloudberryService.parameters.geoLevel);
-                console.log(cloudberryService.parameters.geoIds);
-                console.log(result.value[0]);
-                console.log(cloudberryService.commonChartDataMap);
             }
             // When the query is executed completely, we update the map result cache.
             if((cloudberryConfig.querySliceMills > 0 && !angular.isArray(result.value) &&
