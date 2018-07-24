@@ -4,10 +4,29 @@ angular.module('cloudberry.map')
         $scope.chartData=[];
         // Map to store the chart data for every polygon
         $scope.ChartDataMap = new HashMap();
-        // The maximun value for the chart data
-        $scope.max = 0;
+        // The maximum value for the chart y axes
+        // $scope.maxCount = 0;
 
-        // Convert the array in chartDataMap to count result by month ,and can be read by chart.js
+        // return difference of two arrays
+        function arr_diff (a1, a2) {
+            var a = [], diff = [];
+            for (var i = 0; i < a1.length; i++) {
+                a[a1[i]] = true;
+            }
+            for (var j = 0; j < a2.length; j++) {
+                if (a[a2[j]]) {
+                    delete a[a2[j]];
+                } else {
+                    a[a2[j]] = true;
+                }
+            }
+            for (var k in a) {
+                diff.push(k);
+            }
+            return diff;
+        }
+
+        // Convert the array in chartDataMap to count result by month, which can be read by chart.js
         $scope.preProcess = function (result) {
             // group by year
             groups = result.reduce(function (r, o) {
@@ -19,20 +38,47 @@ angular.module('cloudberry.map')
 
             // sum up the result for every month
             var resultByMonth = [];
+            var hasCountMonth = [];
             for (var i=0; i<resultByYear.length;i++){
                 groups = resultByYear[i].data.reduce(function (r, o) {
                     var m = o.day.split(('-'))[1];
-                    (r[m])? r[m].y+=o.count : r[m] = { y: o.count, x:new Date(resultByYear[i].year,m-1)};
+                    if (r[m]){
+                        r[m].y += o.count;
+                    }else{
+                        var thisMonth = new Date(resultByYear[i].year,m-1);
+                        r[m] = { y: o.count, x: thisMonth};
+                        hasCountMonth.push(thisMonth);
+                    }
                     return r;
                 }, {});
                 var resultByMonthOneYear = Object.keys(groups).map(function(k){ return groups[k]; });
                 resultByMonth = resultByMonth.concat(resultByMonthOneYear);
             }
 
+            // add empty data point
+            var zeroCountMonth = [];
+            var minDate = cloudberry.parameters.timeInterval.start;
+            var maxDate = cloudberry.parameters.timeInterval.end;
+            for (var m = new Date(minDate.getFullYear(),minDate.getMonth());m <= new Date(maxDate.getFullYear(),maxDate.getMonth()); m.setMonth(m.getMonth()+1)){
+                zeroCountMonth.push(new Date(m.getTime()));
+            }
+            zeroCountMonth = arr_diff(hasCountMonth,zeroCountMonth);
+            for (var j = 0; j < zeroCountMonth.length; j++) {
+                resultByMonth.push({x: new Date(zeroCountMonth[j]), y:0});
+            }
+
             // sort the date
             resultByMonth.sort(function(a,b){
-                return b.x - a.x;
+                return a.x - b.x;
             });
+
+            // for(var j = 0; j < resultByMonth.length; j++)  {
+            //     if(resultByMonth[j].y>$scope.maxCount){
+            //         $scope.maxCount = resultByMonth[j].y;
+            //     }
+            // }
+            // console.log($scope.maxCount);
+
             return resultByMonth;
         };
 
@@ -44,18 +90,6 @@ angular.module('cloudberry.map')
             function(newResult) {
                 if(newResult) {
                     $scope.ChartDataMap = newResult;
-                    // console.log(newResult);
-                    // for(i = 0; i < newResult.count; i++)  {
-                    //     if(newResult[i]){
-                    //       console.log(newResult[i]);
-                    //         for(j = 0; j < arr.length; j++) {
-                    //             if(value[j].count>max) {
-                    //                 $scope.max =value[j].count;
-                    //             }
-                    //         }
-                    //     }
-                    // });
-
                 }
             }
         );
@@ -149,9 +183,7 @@ angular.module('cloudberry.map')
                     $scope.selectedPlace = layer.feature;
                     $scope.selectedGeoID = $scope.selectedPlace.properties.cityID || $scope.selectedPlace.properties.countyID || $scope.selectedPlace.properties.stateID;
                     var geoIDChartData = $scope.ChartDataMap.get($scope.selectedGeoID);
-                    if (geoIDChartData) {
-                        $scope.chartData = $scope.preProcess(geoIDChartData);
-                    }
+                    (geoIDChartData)? $scope.chartData = $scope.preProcess(geoIDChartData) : $scope.chartData = [];
 
                     // get the count info of polygon
                     var placeName = $scope.selectedPlace.properties.name;
@@ -185,7 +217,6 @@ angular.module('cloudberry.map')
                                 datasets:[{
                                     lineTension: 0,
                                     data:$scope.chartData,
-                                    // backgroundColor: "#3e95cd",
                                     borderColor:"#3e95cd",
                                     borderWidth: 0.8,
                                     pointRadius: 1.5
@@ -198,7 +229,6 @@ angular.module('cloudberry.map')
                                 },
                                 scales: {
                                     xAxes: [{
-                                        // barThickness: 1,
                                         type: 'time',
                                         time: {
                                             unit:'month'
@@ -214,7 +244,8 @@ angular.module('cloudberry.map')
                                             labelString: 'Count'
                                         },
                                         ticks: {
-                                            beginAtZero: true
+                                            beginAtZero: true,
+                                            suggestedMax: 4
                                         }
                                     }]
                                 }
