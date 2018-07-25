@@ -200,9 +200,9 @@ angular.module('cloudberry.map')
                         '<div id="popup-count">'+infoPromp+'<b> '+countText+'</b></div>' +
                         '</div>'+
                         "<canvas id=\"myChart\"></canvas>";
-                    $scope.popUpInfo = L.popup();
-                    $scope.popUpInfo.setContent(linechart);
-                    layer.bindPopup($scope.popUpInfo).openPopup();
+                    var popUp = L.popup();
+                    layer.bindPopup(popUp).openPopup();
+                    popUp.setContent(linechart).setLatLng([$scope.selectedPlace.properties.popUpLat,$scope.selectedPlace.properties.popUpLog]);
 
                     // If there are chartData, draw the line chart
                     if($scope.chartData.length===0) {
@@ -288,6 +288,7 @@ angular.module('cloudberry.map')
                     mouseover: highlightPopupInfo,
                     mouseout: resetHighlight,
                     click: $scope.zoomToFeature
+                    //Todo: 关闭阿拉斯加的popup window
                 });
             }
 
@@ -555,6 +556,7 @@ angular.module('cloudberry.map')
             }
 
             function setCountLegend(div) {
+                div.style.margin = '20% 0 0 0';
                 var grades = new Array(colors.length -1); //[1, 10, 100, 1000, 10000, 100000]
                 setGrades(grades);
                 var gName  = getGradesNames(grades);
