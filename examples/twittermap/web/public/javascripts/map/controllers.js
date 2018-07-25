@@ -349,8 +349,10 @@ angular.module('cloudberry.map', ['leaflet-directive', 'cloudberry.common','clou
     
     // zoom in to fit the selected polygon
     $scope.zoomToFeature = function zoomToFeature(leafletEvent) {
-      if (leafletEvent)
-        $scope.map.fitBounds(leafletEvent.target.getBounds());
+      if (leafletEvent){
+          $scope.map.fitBounds(leafletEvent.target.getBounds());
+          $(".leaflet-popup-close-button")[0].click();
+      }
     }
     
     // register the zoom event handler

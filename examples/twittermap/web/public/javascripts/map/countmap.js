@@ -194,22 +194,32 @@ angular.module('cloudberry.map')
                         countText = $scope.selectedPlace.properties.countText;
                     }
 
+                    // Generate the html in pop up window
+                    var linechart;
+                    if($scope.chartData.length===0) {
+                        linechart = '<div id="popup-info" style="margin-bottom: 0">' +
+                            '<div id="popup-statename">'+logicLevel+': '+placeName+'</div>' +
+                            '<div id="popup-count" style="margin-bottom: 0">'+infoPromp+'<b> '+countText+'</b></div>' +
+                            '</div>'+
+                            "<canvas id=\"myChart\" height=\"0\" ></canvas>";
+                    }else {
+                        linechart = '<div id="popup-info">' +
+                            '<div id="popup-statename">'+logicLevel+': '+placeName+'</div>' +
+                            '<div id="popup-count">'+infoPromp+'<b> '+countText+'</b></div>' +
+                            '</div>'+
+                            "<canvas id=\"myChart\"></canvas>";
+                    }
+
                     // bind a pop up window
-                    var linechart = '<div id="popup-info">' +
-                        '<div id="popup-statename">'+logicLevel+': '+placeName+'</div>' +
-                        '<div id="popup-count">'+infoPromp+'<b> '+countText+'</b></div>' +
-                        '</div>'+
-                        "<canvas id=\"myChart\"></canvas>";
                     var popUp = L.popup();
+                    popUp.setContent(linechart);
                     layer.bindPopup(popUp).openPopup();
-                    popUp.setContent(linechart).setLatLng([$scope.selectedPlace.properties.popUpLat,$scope.selectedPlace.properties.popUpLog]);
+                    if($scope.selectedPlace.properties.popUpLat){
+                        popUp.setLatLng([$scope.selectedPlace.properties.popUpLat,$scope.selectedPlace.properties.popUpLog]);
+                    }
 
                     // If there are chartData, draw the line chart
-                    if($scope.chartData.length===0) {
-                        document.getElementById("myChart").style.height = 0;
-                        document.getElementById("popup-count").style.marginBottom = 0;
-                        document.getElementById("popup-info").style.marginBottom = 0;
-                    }else {
+                    if($scope.chartData.length !== 0) {
                         var ctx = document.getElementById("myChart").getContext('2d');
                         var myChart = new Chart(ctx, {
                             type: 'line',
@@ -288,7 +298,6 @@ angular.module('cloudberry.map')
                     mouseover: highlightPopupInfo,
                     mouseout: resetHighlight,
                     click: $scope.zoomToFeature
-                    //Todo: 关闭阿拉斯加的popup window
                 });
             }
 
