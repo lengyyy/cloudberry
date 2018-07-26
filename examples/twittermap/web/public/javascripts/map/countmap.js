@@ -4,8 +4,6 @@ angular.module('cloudberry.map')
         $scope.chartData=[];
         // Map to store the chart data for every polygon
         $scope.ChartDataMap = new HashMap();
-        // The maximum value for the chart y axes
-        // $scope.maxCount = 0;
 
         // return difference of two arrays
         function arr_diff (a1, a2) {
@@ -71,13 +69,6 @@ angular.module('cloudberry.map')
             resultByMonth.sort(function(a,b){
                 return a.x - b.x;
             });
-
-            // for(var j = 0; j < resultByMonth.length; j++)  {
-            //     if(resultByMonth[j].y>$scope.maxCount){
-            //         $scope.maxCount = resultByMonth[j].y;
-            //     }
-            // }
-            // console.log($scope.maxCount);
 
             return resultByMonth;
         };
@@ -211,12 +202,14 @@ angular.module('cloudberry.map')
                     }
 
                     // bind a pop up window
-                    var popUp = L.popup();
-                    popUp.setContent(linechart);
+                    var popUp = L.popup({
+                        autoClose: false,
+                        closeOnClick: false
+                    });
+                    // $scope.map.addLayer(popUp);
                     layer.bindPopup(popUp).openPopup();
-                    if($scope.selectedPlace.properties.popUpLat){
-                        popUp.setLatLng([$scope.selectedPlace.properties.popUpLat,$scope.selectedPlace.properties.popUpLog]);
-                    }
+                    popUp.setContent(linechart);
+                    popUp.setLatLng([$scope.selectedPlace.properties.popUpLat,$scope.selectedPlace.properties.popUpLog]);
 
                     // If there are chartData, draw the line chart
                     if($scope.chartData.length !== 0) {
@@ -265,6 +258,13 @@ angular.module('cloudberry.map')
                 }
             }
 
+            // close the current popup window
+            function closePopup(leafletEvent) {
+                if(leafletEvent.originalEvent.relatedTarget.toString()!=="[object HTMLDivElement]" && $(".leaflet-popup-close-button")[0]) {
+                    $(".leaflet-popup-close-button")[0].click();
+                }
+            }
+
             // remove the highlight interaction function for the polygons
             function resetHighlight(leafletEvent) {
                 if (cloudberry.parameters.maptype == 'countmap'){
@@ -285,6 +285,7 @@ angular.module('cloudberry.map')
                     }
                     if (leafletEvent){
                         leafletEvent.target.setStyle(style);
+                        setTimeout(closePopup(leafletEvent),500);
                     }
                 }
             }
@@ -300,6 +301,8 @@ angular.module('cloudberry.map')
                     click: $scope.zoomToFeature
                 });
             }
+
+
 
             // // add info control
             // var info = L.control();

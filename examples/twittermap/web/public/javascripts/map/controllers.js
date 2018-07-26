@@ -152,6 +152,7 @@ angular.module('cloudberry.map', ['leaflet-directive', 'cloudberry.common','clou
       });
 
       $scope.resetGeoInfo("state");
+
     };
     
     // redraw the polygons with the new map styles
@@ -354,7 +355,8 @@ angular.module('cloudberry.map', ['leaflet-directive', 'cloudberry.common','clou
           $(".leaflet-popup-close-button")[0].click();
       }
     }
-    
+
+
     // register the zoom event handler
     // use postProcess function if additional operations are required
     $scope.resetZoomFunction = function resetZoomFunction(onEachFeature, postProcess = function(){}){
