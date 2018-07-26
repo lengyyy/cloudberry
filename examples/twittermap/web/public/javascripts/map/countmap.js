@@ -202,14 +202,9 @@ angular.module('cloudberry.map')
                     }
 
                     // bind a pop up window
-                    var popUp = L.popup({
-                        autoClose: false,
-                        closeOnClick: false
-                    });
-                    // $scope.map.addLayer(popUp);
+                    var popUp = L.popup();
                     layer.bindPopup(popUp).openPopup();
-                    popUp.setContent(linechart);
-                    popUp.setLatLng([$scope.selectedPlace.properties.popUpLat,$scope.selectedPlace.properties.popUpLog]);
+                    popUp.setContent(linechart).setLatLng([$scope.selectedPlace.properties.popUpLat,$scope.selectedPlace.properties.popUpLog]);
 
                     // If there are chartData, draw the line chart
                     if($scope.chartData.length !== 0) {
@@ -302,8 +297,6 @@ angular.module('cloudberry.map')
                 });
             }
 
-
-
             // // add info control
             // var info = L.control();
             //
@@ -331,7 +324,6 @@ angular.module('cloudberry.map')
             // }
 
             $scope.loadGeoJsonFiles(onEachFeature);
-
             $scope.resetZoomFunction(onEachFeature);
             $scope.resetDragFunction(onEachFeature);
         }
