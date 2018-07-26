@@ -255,7 +255,8 @@ angular.module('cloudberry.map')
 
             // close the current popup window
             function closePopup(leafletEvent) {
-                if(leafletEvent.originalEvent.relatedTarget.toString()!=="[object HTMLDivElement]" && $(".leaflet-popup-close-button")[0]) {
+                var orginalTarget = leafletEvent.originalEvent.relatedTarget;
+                if(orginalTarget && orginalTarget.toString()!=="[object HTMLDivElement]" && $(".leaflet-popup-close-button")[0]) {
                     $(".leaflet-popup-close-button")[0].click();
                 }
             }
