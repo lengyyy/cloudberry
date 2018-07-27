@@ -253,15 +253,7 @@ angular.module('cloudberry.map')
                 }
             }
 
-            // close the current popup window
-            function closePopup(leafletEvent) {
-                var orginalTarget = leafletEvent.originalEvent.relatedTarget;
-                if(orginalTarget && orginalTarget.toString()!=="[object HTMLDivElement]" && $(".leaflet-popup-close-button")[0]) {
-                    $(".leaflet-popup-close-button")[0].click();
-                }
-            }
-
-            // remove the highlight interaction function for the polygons
+            // remove the highlight interaction function for the polygons， and close popup window
             function resetHighlight(leafletEvent) {
                 if (cloudberry.parameters.maptype == 'countmap'){
                     var style;
@@ -281,7 +273,10 @@ angular.module('cloudberry.map')
                     }
                     if (leafletEvent){
                         leafletEvent.target.setStyle(style);
-                        setTimeout(closePopup(leafletEvent),500);
+                        var orginalTarget = leafletEvent.originalEvent.relatedTarget;
+                        if(orginalTarget && orginalTarget.toString()!=="[object HTMLDivElement]" && $(".leaflet-popup-close-button")[0]) {
+                            $(".leaflet-popup-close-button")[0].click();
+                        }
                     }
                 }
             }
