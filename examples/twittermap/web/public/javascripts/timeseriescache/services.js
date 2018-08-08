@@ -89,10 +89,9 @@ angular.module('cloudberry.timeseriescache', [])
         /**
          * Convert byTimeSeries result array to timeseriesStore HashMap format.
          */
-        this.arrayToStore = function (geoIds, timeseriesResult, geolevel) {
+        this.arrayToStore = function (geoIds, timeseriesResult, currentGeoLevel) {
             var store = new HashMap();
             var geoIdSet = new Set(geoIds);
-            currentGeoLevel = geolevel;
 
             for (var i = 0; i < timeseriesResult.length; i++) {
                 var currVal = {day:timeseriesResult[i]["day"], count:timeseriesResult[i]["count"]};
